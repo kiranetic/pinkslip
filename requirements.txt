@@ -2,3 +2,4 @@ python-decouple
 gspread
 oauth2client
 PyYAML
+ollama
