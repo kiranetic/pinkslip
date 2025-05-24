@@ -1,1 +1,3 @@
 python-decouple
+gspread
+oauth2client
