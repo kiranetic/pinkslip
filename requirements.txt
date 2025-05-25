@@ -4,3 +4,4 @@ oauth2client
 PyYAML
 ollama
 rendercv[full]
+python-slugify

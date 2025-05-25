@@ -1,35 +1,28 @@
 import yaml
-from config import YAML_RESUME_DATA
-from core.sheets import fetch_job_applications
+from config import YAML_RESUME_DATA, SHEET_NAME, RESUME_NAME_PREFIX
 from core.resume_loader import load_resume_yaml
-from core.resume_generator import generate_custom_resume
+from core.sheets import fetch_job_applications
 from core.logger import logger
-from core.rendercv_wrapper import render_pdf_from_yaml
+from core.rendercv_wrapper import rendercv_init
+from core.job_processor import process_job_application
 
 
 if __name__ == "__main__":
-    apps = fetch_job_applications(sheet_name="PS-Jobs")
-    for app in apps:
-        print(f"{app.id}: {app.role} at {app.company} — Contact: {app.name} ({app.email})")
+    # apps = fetch_job_applications(sheet_name="PS-Jobs")
+    # for app in apps:
+    #     print(f"{app.id}: {app.role} at {app.company} — Contact: {app.name} ({app.email})")
 
     try:
-        logger.info("Starting resume generation process...")
         resume_dict = load_resume_yaml(YAML_RESUME_DATA)
         resume_yaml_str = yaml.dump(resume_dict)
 
-        job_description = "Looking for a backend Python engineer experienced with FastAPI, PostgreSQL, and CI/CD on cloud infrastructure."
+        paths, base_cmd = rendercv_init()
 
-        tailored_resume = generate_custom_resume(resume_yaml_str, job_description)
+        applications = fetch_job_applications(sheet_name=SHEET_NAME)
 
-        if tailored_resume:
-            logger.info("Successfully generated tailored resume.")
-            print("\n" + tailored_resume)
-            with open("resume_out.yml", "w", encoding="utf-8") as f:
-                f.write(tailored_resume)
-        else:
-            logger.warning("Failed to generate a tailored resume. Empty response.")
+        for app in applications:
+            process_job_application(app, resume_yaml_str, base_cmd, paths["output"], RESUME_NAME_PREFIX)
 
-        render_pdf_from_yaml("resume_out.yml", "abc.pdf")
     except Exception as e:
         logger.exception(f"Unexpected error in main: {str(e)}")
         raise
