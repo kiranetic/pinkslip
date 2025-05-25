@@ -4,6 +4,7 @@ from core.sheets import fetch_job_applications
 from core.resume_loader import load_resume_yaml
 from core.resume_generator import generate_custom_resume
 from core.logger import logger
+from core.rendercv_wrapper import render_pdf_from_yaml
 
 
 if __name__ == "__main__":
@@ -23,8 +24,12 @@ if __name__ == "__main__":
         if tailored_resume:
             logger.info("Successfully generated tailored resume.")
             print("\n" + tailored_resume)
+            with open("resume_out.yml", "w", encoding="utf-8") as f:
+                f.write(tailored_resume)
         else:
             logger.warning("Failed to generate a tailored resume. Empty response.")
+
+        render_pdf_from_yaml("resume_out.yml", "abc.pdf")
     except Exception as e:
         logger.exception(f"Unexpected error in main: {str(e)}")
         raise
