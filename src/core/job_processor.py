@@ -1,9 +1,9 @@
 import os
 from slugify import slugify
-from core.resume_generator import generate_custom_resume
-from core.utils import parse_ai_resume
+from core.utils import parse_ai_resume, build_resume_prompt
 from core.rendercv_wrapper import run_rendercv
 from core.logger import logger
+from core.llm_interface import call_llm
 
 
 def process_job_application(app, resume_yaml_str, base_cmd, output_dir, resume_prefix):
@@ -13,10 +13,11 @@ def process_job_application(app, resume_yaml_str, base_cmd, output_dir, resume_p
     job_output_dir = os.path.join(output_dir, folder_name)
     os.makedirs(job_output_dir, exist_ok=True)
 
-    tailored_resume = generate_custom_resume(resume_yaml_str, app.job_description)
+    resume_prompt = build_resume_prompt(resume_yaml_str, app.role, app.job_description)
+    tailored_resume = call_llm(resume_prompt)
     if not tailored_resume:
         logger.error(f"Failed to generate resume for job ID {app.id}. Empty response.")
-        continue
+        return
 
     cv_file = parse_ai_resume(tailored_resume, job_output_dir, resume_prefix)
     pdf_file_name = f"{resume_prefix}_{app.id}.pdf"

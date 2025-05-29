@@ -14,7 +14,7 @@ if __name__ == "__main__":
 
     try:
         resume_dict = load_resume_yaml(YAML_RESUME_DATA)
-        resume_yaml_str = yaml.dump(resume_dict)
+        resume_yaml_str = yaml.dump(resume_dict, allow_unicode=True, sort_keys=False)
 
         paths, base_cmd = rendercv_init()
 

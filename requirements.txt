@@ -5,3 +5,4 @@ PyYAML
 ollama
 rendercv[full]
 python-slugify
+openai
